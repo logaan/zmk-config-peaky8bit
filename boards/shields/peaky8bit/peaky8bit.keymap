@@ -2,9 +2,8 @@
 //   left half "asdf" (dots 7 3 2 1), right half "jkl;" (dots 4 5 6 8).
 //
 // asdf together -> backspace
-// jkl; together -> space, held until every key of the next chord is released
-//                  (e.g. jkl; then fj sends space+f+j). Do jkl; twice for a
-//                  plain space.
+// jkl; together -> space, held around the whole of the next chord (e.g. jkl;
+//                  then fj sends space+f+j). Do jkl; twice for a plain space.
 //
 // Bluetooth: press all 8 keys together, then one key:
 //   a s d f j -> select profile 0 1 2 3 4

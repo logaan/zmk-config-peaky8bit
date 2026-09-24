@@ -1,9 +1,10 @@
 /*
- * Chord hold: press a key and keep it held until every key of the next chord
- * has been released, e.g. space + dots for braille screen reader commands.
+ * Chord hold: hold a key down around the whole of the next chord, e.g. space +
+ * dots for braille screen reader commands. The key is pressed just before the
+ * chord's first key (so the host doesn't auto-repeat it while waiting) and
+ * released after the chord's last key.
  *
- * Triggering the behavior again while its key is held releases the key, so
- * doing it twice in a row sends a plain tap.
+ * Triggering the behavior again before the next chord sends a plain tap.
  *
  * SPDX-License-Identifier: MIT
  */
@@ -25,9 +26,11 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 static struct {
     bool active;
     uint32_t encoded;
-    // Keycodes pressed since the held key went down that are still down.
+    // Whether the key has been sent to the host yet.
+    bool pressed;
+    // Keycodes of the current chord that are still down.
     int held;
-    // Whether any other keycode has been pressed since the held key went down.
+    // Whether the next chord has started.
     bool chord_started;
 } state;
 
@@ -36,25 +39,33 @@ static bool is_own_keycode(const struct zmk_keycode_state_changed *ev) {
            (ZMK_HID_USAGE_PAGE(state.encoded) ?: HID_USAGE_KEY) == ev->usage_page;
 }
 
-static int release_held(int64_t timestamp) {
+static void press_held(int64_t timestamp) {
+    state.pressed = true;
+    raise_zmk_keycode_state_changed_from_encoded(state.encoded, true, timestamp);
+}
+
+static void release_held(int64_t timestamp) {
     state.active = false;
-    return raise_zmk_keycode_state_changed_from_encoded(state.encoded, false, timestamp);
+    raise_zmk_keycode_state_changed_from_encoded(state.encoded, false, timestamp);
 }
 
 static int on_chord_hold_binding_pressed(struct zmk_behavior_binding *binding,
                                          struct zmk_behavior_binding_event event) {
     if (state.active) {
-        LOG_DBG("chord hold triggered again, releasing 0x%02X", state.encoded);
+        LOG_DBG("chord hold triggered again, tapping 0x%02X", state.encoded);
+        if (!state.pressed) {
+            press_held(event.timestamp);
+        }
         release_held(event.timestamp);
         return ZMK_BEHAVIOR_OPAQUE;
     }
 
     state.active = true;
     state.encoded = binding->param1;
+    state.pressed = false;
     state.held = 0;
     state.chord_started = false;
-    LOG_DBG("chord hold pressing 0x%02X", state.encoded);
-    raise_zmk_keycode_state_changed_from_encoded(state.encoded, true, event.timestamp);
+    LOG_DBG("chord hold waiting for next chord to press 0x%02X", state.encoded);
     return ZMK_BEHAVIOR_OPAQUE;
 }
 
@@ -81,12 +92,16 @@ static int chord_hold_keycode_state_changed_listener(const zmk_event_t *eh) {
     }
 
     if (ev->state) {
+        if (!state.chord_started) {
+            // Raised synchronously, so it reaches the host before this key.
+            press_held(ev->timestamp);
+        }
         state.held++;
         state.chord_started = true;
         return ZMK_EV_EVENT_BUBBLE;
     }
 
-    // Ignore releases of keys that were already down before the held key was pressed.
+    // Ignore releases of keys that were already down before the chord started.
     if (state.held == 0) {
         return ZMK_EV_EVENT_BUBBLE;
     }
