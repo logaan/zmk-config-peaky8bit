@@ -1,0 +1,7 @@
+#include "../keymap.dtsi"
+
+&kscan {
+    events = <
+        BACKSPACE_CHORD PRESS_F RELEASE_F
+    >;
+};

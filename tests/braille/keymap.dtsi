@@ -1,0 +1,30 @@
+// Pulls in the real keymap on the simulator's mock 2x4 key matrix.
+// Positions: a s d f = 0 1 2 3, j k l ; = 4 5 6 7.
+// Run from a ZMK checkout: ZMK_EXTRA_MODULES=<this repo> zmk/app/run-test.sh <this repo>/tests/braille
+#include "../../boards/shields/peaky8bit/peaky8bit.keymap"
+#include <dt-bindings/zmk/kscan_mock.h>
+
+&kscan {
+    rows = <2>;
+    columns = <4>;
+};
+
+#define PRESS_A ZMK_MOCK_PRESS(0,0,10)
+#define PRESS_S ZMK_MOCK_PRESS(0,1,10)
+#define PRESS_D ZMK_MOCK_PRESS(0,2,10)
+#define PRESS_F ZMK_MOCK_PRESS(0,3,10)
+#define PRESS_J ZMK_MOCK_PRESS(1,0,10)
+#define PRESS_K ZMK_MOCK_PRESS(1,1,10)
+#define PRESS_L ZMK_MOCK_PRESS(1,2,10)
+#define PRESS_SEMI ZMK_MOCK_PRESS(1,3,10)
+#define RELEASE_A ZMK_MOCK_RELEASE(0,0,10)
+#define RELEASE_S ZMK_MOCK_RELEASE(0,1,10)
+#define RELEASE_D ZMK_MOCK_RELEASE(0,2,10)
+#define RELEASE_F ZMK_MOCK_RELEASE(0,3,10)
+#define RELEASE_J ZMK_MOCK_RELEASE(1,0,10)
+#define RELEASE_K ZMK_MOCK_RELEASE(1,1,10)
+#define RELEASE_L ZMK_MOCK_RELEASE(1,2,10)
+#define RELEASE_SEMI ZMK_MOCK_RELEASE(1,3,10)
+
+#define SPACE_CHORD PRESS_J PRESS_K PRESS_L PRESS_SEMI RELEASE_J RELEASE_K RELEASE_L RELEASE_SEMI
+#define BACKSPACE_CHORD PRESS_A PRESS_S PRESS_D PRESS_F RELEASE_A RELEASE_S RELEASE_D RELEASE_F

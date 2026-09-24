@@ -1,0 +1,7 @@
+#include "../keymap.dtsi"
+
+&kscan {
+    events = <
+        SPACE_CHORD PRESS_F PRESS_J RELEASE_F RELEASE_J
+    >;
+};

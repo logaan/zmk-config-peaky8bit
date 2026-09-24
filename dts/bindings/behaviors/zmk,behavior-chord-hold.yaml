@@ -1,0 +1,7 @@
+description: |
+  Presses a key and holds it until every key of the next chord has been
+  released. Triggering it again while the key is held releases it instead.
+
+compatible: "zmk,behavior-chord-hold"
+
+include: one_param.yaml
