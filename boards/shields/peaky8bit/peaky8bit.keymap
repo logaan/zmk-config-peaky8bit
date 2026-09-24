@@ -2,8 +2,9 @@
 //   left half "asdf" (dots 7 3 2 1), right half "jkl;" (dots 4 5 6 8).
 //
 // asdf together -> backspace
-// jkl; together -> space, held around the whole of the next chord (e.g. jkl;
-//                  then fj sends space+f+j). Do jkl; twice for a plain space.
+// jkl; together  -> space
+// fjkl; together -> space, held around the whole of the next chord (e.g.
+//                   fjkl; then fj sends space+f+j)
 //
 // Bluetooth: press all 8 keys together, then one key:
 //   a s d f j -> select profile 0 1 2 3 4
@@ -50,6 +51,12 @@
         space {
             timeout-ms = <150>;
             key-positions = <4 5 6 7>;
+            layers = <DEFAULT>;
+            bindings = <&kp SPACE>;
+        };
+        held_space {
+            timeout-ms = <150>;
+            key-positions = <3 4 5 6 7>;
             layers = <DEFAULT>;
             bindings = <&chord_hold SPACE>;
         };

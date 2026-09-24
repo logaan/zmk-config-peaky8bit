@@ -2,6 +2,6 @@
 
 &kscan {
     events = <
-        HELD_SPACE_CHORD PRESS_F PRESS_J RELEASE_F RELEASE_J
+        HELD_SPACE_CHORD HELD_SPACE_CHORD PRESS_F RELEASE_F
     >;
 };
